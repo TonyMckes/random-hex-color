@@ -1,80 +1,98 @@
-const button = document.querySelector(".bg-changer");
-button.addEventListener("click", setBg);
+// Init
+window.addEventListener("load", () => changeBg(), false);
 
-const bg = document.querySelector(".background-color");
+// Short selectors alias
+const $ = document.querySelector.bind(document);
+const $$ = document.querySelectorAll.bind(document);
 
-// const currentColor = document.querySelector(".current-color");
-const currentColor = document.querySelector(".current-color > span");
-const mouseColor = document.addEventListener("mouseover", colorPreview);
-const colorHistoryD = document.querySelector(".color-history");
-currentColor.addEventListener("mouseenter", showHistory);
+const displayBackground = $(".background-color");
 
-colorHistoryD.addEventListener("mouseleave", hideHistory);
-// currentColor.addEventListener("mouseleave", hideHistory);
+const currentHexColor = $(".current-color > span");
+currentHexColor.addEventListener(
+  "mouseenter",
+  // Show history on mouse enter
+  () => (hexColorHistory.style.visibility = "visible")
+);
 
-const colorHistory = [];
+const hexColorHistory = $(".color-history");
+hexColorHistory.addEventListener("mouseleave", () =>
+  // # Seconds after mouse leaves
+  setTimeout(() => {
+    // hide the history
+    hexColorHistory.style.visibility = "hidden";
+    // restore color to the current.
+    displayBackground.style.backgroundColor = currentHexColor.innerText;
+  }, 350)
+);
 
+const changeColorButton = $(".bg-changer").addEventListener("click", changeBg);
+
+const hoverColorPreview = document.addEventListener("mouseover", (e) => {
+  // If is a hex, show a preview of the color in mouse over
+  if (isHexColor(e.target.outerText)) {
+    displayBackground.style.backgroundColor = e.target.outerText;
+  }
+});
+
+// Saves the last 5 hex
+const hexHistory = [];
+
+// Returns true if the "value" pass to it is a valid hex, returns false otherwise
 const isHexColor = (value) => /^#[0-9A-F]{6}$/i.test(value);
 
-function setBg() {
+//
+function changeBg() {
+  // Hex color generator
   const randomColor =
     "#" +
     Math.floor(Math.random() * 16777215)
       .toString(16)
       .toUpperCase();
 
-  if (isHexColor(randomColor)) {
-    bg.style.backgroundColor = randomColor;
+  // Check if is NOT a valid hex
+  if (!isHexColor(randomColor)) {
+    console.log(`${randomColor} is not a valid hex`);
+    // generate a new hex
+    return changeBg();
   }
 
-  // currentColor.childNodes[0].textContent = randomColor;
-  currentColor.innerText = randomColor;
+  // If valid then change the background color
+  displayBackground.style.backgroundColor = randomColor;
+  // Change text
+  currentHexColor.innerText = randomColor;
+  // Add new hex to history
+  hexHistory.push(randomColor);
 
-  colorHistory.push(randomColor);
+  // Check if history is bigger than 6, remove the first value if it is
+  if (hexHistory.length > 6) hexHistory.shift();
 
-  if (colorHistory.length >= 6) colorHistory.shift();
-
-  const firstItem = document.querySelectorAll("li");
-
-  if (firstItem.length >= 5) firstItem[firstItem.length - 1].remove();
-
-  if (colorHistory[colorHistory.length - 2] !== undefined) {
-    let el = document.createElement("li");
-    el.innerText = colorHistory[colorHistory.length - 2];
-    colorHistoryD.prepend(el);
+  // If the first item of the history is NOT "undefined"
+  if (hexHistory[hexHistory.length - 2] !== undefined) {
+    // Create a new element
+    const listElement = document.createElement("li");
+    // Add the before last hex to the the list element
+    listElement.innerText = hexHistory[hexHistory.length - 2];
+    // Prepend (append as first child) to history list
+    hexColorHistory.prepend(listElement);
   }
+
+  // Get the list of nodes items ("li")
+  const firstItem = $$("li");
+  // Check if the list of nodes equals to 5, if it is remove the first node of the list
+  if (firstItem.length == 6) firstItem[firstItem.length - 1].remove();
+  // return currentHexColor;
 }
 
-function colorPreview(e) {
-  if (isHexColor(e.target.outerText)) {
-    bg.style.backgroundColor = e.target.outerText;
-  }
-}
-
+// On doble click copy the text to the clipboard
 document.ondblclick = () => {
-  // const sel =
-  //   (document.selection && document.selection.createRange().text) ||
-  //   (window.getSelection && window.getSelection().toString());
+  // const selection =
+  // (document.selection && document.selection.createRange().text) ||
+  // (window.getSelection && window.getSelection().toString());
 
-  const sel = window.getSelection().toString();
+  const selection = window.getSelection().toString();
 
-  navigator.clipboard.writeText("#" + sel).then(
-    function () {
-      /* clipboard successfully set */
-    },
-    function () {
-      /* clipboard write failed */
-    }
-  );
+  if (isHexColor("#" + selection)) {
+    navigator.clipboard.writeText("#" + selection).then();
+    //TODO: Add some kind of alert or notification to the user
+  }
 };
-
-function showHistory() {
-  colorHistoryD.style.visibility = "visible";
-}
-function hideHistory() {
-  setTimeout(() => {
-    colorHistoryD.style.visibility = "hidden";
-  }, 200);
-}
-
-setBg();
