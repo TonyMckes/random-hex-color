@@ -1,73 +1,101 @@
 html,
 body {
-  width: 100vw;
-  height: 100vh;
   margin: 0;
-  background-color: #000;
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto Mono", monospace;
 }
 
 .background-color {
-  display: grid;
-  grid:
-    "currentHexColor"
-    "hexColorHistory"
-    "changeColorButton";
-  width: 100vw;
+  display: flex;
+  justify-content: center;
   height: 100vh;
   transition: all 500ms;
   box-shadow: inset 0px 0px 25px #00000040;
+}
+
+.background-color > form {
+  display: grid;
   justify-items: center;
-  align-items: center;
   align-content: center;
-  justify-content: center;
+  gap: 18rem;
+  grid:
+    "currentHexColor"
+    "changeColorButton";
 }
 
 .current-color {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 4rem;
   grid-area: currentHexColor;
   position: relative;
-  font-weight: 500;
-  color: #111;
-  background-color: #ddd;
-  border-radius: 10px;
-  box-shadow: 5px 5px 25px 5px #00000040;
 }
 
-.current-color > span {
-  padding: 0 10px;
-  font-size: 3em;
-  text-align: center;
+.current-color > label {
+  min-width: 7ch;
+  background-color: #ddd;
+  border-radius: 0.7rem;
+  font-size: 3rem;
+  color: #606060;
+  box-shadow: 5px 5px 25px 5px #00000040;
+  z-index: 2;
+  border-style: none solid none solid !important;
+  padding: 0 0.7rem;
+}
+
+input {
+  outline: 0;
+  padding: 0;
+  font-weight: 500;
+  border: 0;
+  background-color: #ddd0;
+  color: #222;
+  font-family: inherit;
+  font-size: 3rem;
 }
 
 .color-history {
-  grid-area: hexColorHistory;
-  min-height: 6em;
-  margin-bottom: 1em;
-  padding: 10px;
-  width: 4.3em;
-  color: #111;
+  padding: 0 0.2rem;
+  color: #222;
   list-style: none;
-  visibility: hidden;
   background-color: #ddd;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 5px 5px 25px 5px #00000040;
-  font-size: 2.5rem;
-  text-align: left;
+  border-radius: 0 0 0.7rem 0.7rem;
+  box-shadow: inset 0px 5px 20px 0px #00000040;
+  font-size: 2rem;
+  cursor: pointer;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(-6em);
+  transition: all 0.3s ease 0s, visibility 0s linear 0.3s;
 }
 
+.current-color:focus .color-history,
+.current-color:focus-within .color-history,
+.current-color:hover .color-history {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s, 0s, 0.3s;
+}
+
+.color-history > li::before {
+  content: "#";
+  color: #606060;
+}
+.color-history > li {
+  padding: 0 0.5rem;
+}
 .color-history > li:hover {
   background-color: #ccc;
-  border-radius: 8px;
+  border-radius: 0.7rem;
 }
 
 /* Button styles not done by me! - https://codepen.io/alvarotrigo/pen/RwVRYGN */
-.button-container {
-  grid-area: changeColorButton;
-}
-
 .glow-on-hover {
-  width: 12em;
-  height: 4em;
+  grid-area: changeColorButton;
+  font-size: 1rem;
+  font-family: "Roboto", sans-serif;
+  width: 12rem;
+  height: 3.5rem;
   border: none;
   outline: none;
   color: #fff;
@@ -75,7 +103,7 @@ body {
   cursor: pointer;
   position: relative;
   z-index: 0;
-  border-radius: 10px;
+  border-radius: 0.7rem;
 }
 
 .glow-on-hover:before {
